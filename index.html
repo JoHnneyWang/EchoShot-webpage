@@ -1,0 +1,1155 @@
+
+<html lang="en">
+  <head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Gabarito:wght@400..900&family=Great+Vibes&family=Outfit:wght@100..900&family=Splash&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>EchoShot</title>
+    <meta name="description" content="Multi-Shot Portrait Video Generation">
+    <meta name="keywords" content="Video generation, Diffusion model, Subject-consistent">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#EDE8F5">
+    <meta property="og:image" content="">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css'>
+    <link rel="shortcut icon" href="./static/images/icon.png" type="image/x-icon">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+            min-height: 200vh;
+            position: relative;
+            --bg-opacity: 1;
+
+            /* 关键改动：设置 body 的背景颜色为黑色 */
+            background-color: #000000; /* 或者任何你想要的深色，例如 #1a1a1a */
+        }
+
+        /* 其他 CSS 保持不变 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('./static/images/bg2.png');
+            background-size: 100% auto;
+            background-position: top;
+            background-repeat: no-repeat;
+            background-color: #000000;
+            z-index: -1;
+            opacity: var(--bg-opacity);
+            transition: opacity 0.2s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        video {
+            background-color: #000000;
+            aspect-ratio: 832 / 480;
+        }
+
+        section.multi_ip video {
+            background-color: #000000;
+            aspect-ratio: 832 / 480;
+            object-fit: cover;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: "Roboto", sans-serif;
+            padding: 0;
+            margin: 0;
+        }
+
+        #intro {
+            padding: 100px 0 80px 0;
+            justify-content: center; /* Center content vertically */
+            text-align: center; /* Center text alignment */
+            background-size: cover; /* Cover the entire container */
+            background-position: center; /* Center the background image */
+            background-color: none;
+            color: #ffffff; /* Ensure text color is readable */
+        }
+
+        #intro h1 {
+            font-size: 90px;
+            font-weight: 400;
+            /* margin: 20px 0; */
+        } 
+
+        #intro h2 {
+            font-size: 55px;
+            margin: 20px 0 40px 0;
+            font-weight: 400;
+            color: #ffffff
+        }
+
+        #intro h2 strong {
+            color: #fff;
+        }
+
+        .authors {
+            font-family: 'EB Garamond';
+            font-size: 22px;
+            font-weight: 600;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 25px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .author-block {
+            display: inline-block;
+            margin: 0 10px 0 10px;
+        }
+
+        .author-block a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 1s ease-out;
+        }
+
+        .author-block a:hover {
+            color: #fff;
+        }
+
+        .author-affiliation {
+            font-family: 'EB Garamond';
+            font-size: 20px;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 20px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .author-affiliation .author-block {
+            display: inline-block;
+            margin: 0 15px;
+        }
+
+        section {
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .content {
+            padding: 0 10%;
+        }
+
+        .button {
+            background-color: #2b2b2b;
+            color: #e1e1e1;
+            padding: 12px 23px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.5s;
+            text-decoration: none;
+            margin-top: 30px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .button:hover {
+            background-color: #000000;
+            color: #e1e1e1;
+        }
+
+        .bibtex-section {
+            background-color: #11111100;
+            padding: 40px 10%;
+            text-align: center;
+            margin-top: 60px;
+            color: #ccc;
+        }
+
+        .bibtex-section h3 {
+            font-family: 'Cinzel';
+            font-size: 28px;
+            font-weight: 600;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .bibtex-code {
+            background-color: #222;
+            color: #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            display: inline-block;
+            font-family: monospace;
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        section {
+            margin-top: 100px;
+        }
+        section:first-of-type {
+            margin-top: 0;
+        }
+
+        .title {
+            background-color: #00000000;
+            font-family: 'Cinzel';
+            position: sticky;
+            top: 0;
+            padding: 20px 10%;
+            font-size: 30px;
+            font-weight: 600;
+            z-index: 1000;
+            min-height: 60px;
+            box-sizing: border-box;
+            opacity: 0; /* 初始状态为透明 */
+            transform: translateY(50px); /* 初始位置向下偏移 */
+            transition: opacity 0.2s ease, transform 0.2s ease, font-size 0.2s ease; /* 添加过渡效果 */
+        }
+
+        /* 激活动画的类 */
+        .title.active {
+            opacity: 1; /* 完全显示 */
+            transform: translateY(0); /* 回到原位 */
+        }
+
+        .description {
+            font-family: 'crimson pro';
+            padding: 0 10% 20px 10%;
+            color: #acacac;
+            line-height: 25px;
+            font-weight: 300;
+            font-size: 20px;
+            opacity: 0; /* 初始状态为透明 */
+            transform: translateY(50px); /* 初始位置向下偏移 */
+            transition: opacity 0.2s ease, transform 0.2s ease; /* 添加过渡效果 */
+        }
+
+        .description.active {
+            opacity: 1; /* 完全显示 */
+            transform: translateY(0); /* 回到原位 */
+        }
+
+        .flex > div {
+            width: calc(100% / 3 - 5px * 2 / 3);
+            margin-top: 2.5px;
+            margin-bottom: 2.5px;
+            position: relative;
+        }
+
+        .flex {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 0 5px;
+            opacity: 0; /* 初始状态为透明 */
+            transform: translateY(50px); /* 初始位置向下偏移 */
+            transition: opacity 0.5s ease, transform 0.5s ease; /* 添加过渡效果 */
+        }
+
+        .flex.active {
+            opacity: 1; /* 完全显示 */
+            transform: translateY(0); /* 回到原位 */
+        }
+
+        .prompt-wrap {
+            position: relative;
+        }
+
+        .flex-2 {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 0 5px;
+            opacity: 0; /* 初始状态为透明 */
+            transform: translateY(50px); /* 初始位置向下偏移 */
+            transition: opacity 0.5s ease, transform 0.5s ease; /* 添加过渡效果 */
+        }
+
+        .flex-2.active {
+            opacity: 1; /* 完全显示 */
+            transform: translateY(0); /* 回到原位 */
+        }
+
+        .flex-2 > div {
+            width: calc(100% / 2 - 5px / 2);
+            /* min-width: calc(100% / 3 - 5px * 2 / 3); */
+            /* max-width: calc(100vh - 200px); */
+        }
+
+        .flex-4 {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 0 5px;
+            opacity: 0; /* 初始状态为透明 */
+            transform: translateY(50px); /* 初始位置向下偏移 */
+            transition: opacity 0.5s ease, transform 0.5s ease; /* 添加过渡效果 */
+        }
+
+        .flex-4.active {
+            opacity: 1; /* 完全显示 */
+            transform: translateY(0); /* 回到原位 */
+        }
+
+        .flex-4 > div {
+            width: calc(100% / 4 - 5px / 4);
+            /* min-width: calc(100% / 3 - 5px * 2 / 3); */
+            /* max-width: calc(100vh - 200px); */
+        }
+
+        video, img {
+            width: 100%;
+        }
+
+        .prompt {
+            font-family: 'times';
+            max-width: calc(100% - 20px);
+            position: absolute;
+            background: rgba(0,0,0,0.5);
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            backdrop-filter: blur(10px);
+            bottom: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            box-sizing: border-box;
+        }
+        
+
+        .flex-very-compact .full-screen-button {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            right: 0;
+            border-radius: 0;
+        }
+
+        .chinese {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-weight: bold;
+            color: #d18585;
+            font-size: 1.1em;
+        }
+
+        @media (hover: hover) {
+            .prompt-wrap:hover .prompt,
+            .full-screen-wrap:hover .full-screen-button {
+                opacity: 1;
+                pointer-events: all;
+            }
+            #contributors a:hover {
+                background-color: #222;
+            }
+        }
+
+        @media (hover: none) {
+            #contributors a {
+                pointer-events: none;
+            }
+        }
+
+        .margin-top {
+            margin-top: 50px;
+        }
+
+        .ruler {
+            text-align: center;
+            position: sticky;
+            top: 60px;
+            z-index: 999;
+            background-color: #000;
+            color: #999;
+            padding: 5px 0;
+        }
+
+        .ruler > div {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #title-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        #title-icon {
+          height: 8em;
+          width: auto;
+          margin-right: 0px;
+          vertical-align: middle;
+        }
+
+        .title-art {
+          font-family: 'Great Vibes', times;
+        }
+
+        .title-art2 {
+          font-family: 'Outfit', times;
+        }
+
+        .title-art3 {
+          font-family: 'Splash', times;
+          font-weight: 200;
+          font-size: 90px;
+          opacity: 0; /* 初始状态为透明 */
+          transform: translateY(50px); /* 初始位置向下偏移 */
+          transition: opacity 1s ease, transform 1s ease; /* 添加过渡效果 */
+        }
+
+        .title-art3.active {
+            opacity: 1; /* 完全显示 */
+            transform: translateY(0); /* 回到原位 */
+        }
+
+        h2 {
+            font-size: 2.5em;
+            color: rgb(255, 255, 255);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        #video-wrapper {
+          border-radius: 50px;
+          max-width: 720px;
+          padding-bottom: 40%; 
+          margin: 0 auto;
+          background: #000000;
+        }
+
+        .bold-text {
+            color: #e1e1e1;
+            font-weight: bold;
+        }
+
+        .loading-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .loading-text {
+            font-family: 'times';
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .loading-icon {
+            width: 100;
+            height: 100;
+        }
+
+        .show-img {
+            width: 50vw;           /* 图片宽度为视窗宽度的 80% */
+            min-width: 300px;      /* 最小宽度为 300px，防止过小 */
+            height: auto;          /* 自动高度，保持宽高比 */
+            display: block;        /* 去除底部多余空白 */
+            margin: 0 auto;        /* 居中显示 */
+            opacity: 0; /* 初始状态为透明 */
+            transform: translateY(50px); /* 初始位置向下偏移 */
+            transition: opacity 0.5s ease, transform 0.5s ease; /* 添加过渡效果 */
+            border: 3px solid #dcdcdc;      /* 边框 */
+            border-radius: 8px;         /* 圆角 */
+            box-shadow: 0 4px 10px rgb(0, 0, 0); /* 阴影 */
+        }
+
+        .show-img.active {
+            opacity: 1; /* 完全显示 */
+            transform: translateY(0); /* 回到原位 */
+        }
+
+        
+
+    </style>
+</head>
+<body>
+    <section id="intro">
+        <div class="content">
+            <div id="title-container">
+              <!-- <img id="title-icon" src="./static/images/icon1.png" alt="Icon" style="width: 100px; height: 100px;"> -->
+              <h1 class="title-art" style="font-size:125px"><strong>EchoShot</strong></h1>
+            </div>
+            <h2 class="title-art2">Multi-Shot Portrait Video Generation</h2>
+
+            <div class="authors">
+                <span class="author-block">
+              <a href="https://scholar.google.com/citations?hl=en&user=zQnTBEoAAAAJ">Jiahao Wang</a><sup>1</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=73JaDUQAAAAJ&hl=en&oi=ao">Hualian Sheng</a><sup>2</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=LMVeRVAAAAAJ&hl=en&oi=ao">Sijia Cai</a><sup>2,&dagger;</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            <span class="author-block">
+              <a href="https://gr.xjtu.edu.cn/web/zhangwzh123/">Weizhan Zhang</a><sup>1,*</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            <span class="author-block">
+              <a href="https://gr.xjtu.edu.cn/web/yancaixia">Caixia Yan</a><sup>1</sup>
+            </span>
+            <span class="author-block">
+              <a href="">Yachuang Feng</a><sup>2</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=VQp_ye4AAAAJ&hl=zh-CN&oi=ao">Bing Deng</a><sup>2</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=T9AzhwcAAAAJ&hl=zh-CN&oi=ao">Jieping Ye</a><sup>2</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            </div>
+
+            <!-- Added the affiliations section -->
+            <div class="author-affiliation">
+                <p><span><sup> &dagger;</sup>Project Lead&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<sup>*</sup>Corresponding Author</span></p>
+                
+            </div>
+            <div class="author-affiliation">
+                <p><span class="author-block"><sup>1</sup>Xi'an Jiaotong University</span>
+                    <span class="author-block"><sup>2</sup>Alibaba Cloud</span><br></p>
+            </div>
+            
+            <a class="button" href="https://arxiv.org/abs/2506.15838" target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-file-pdf" style="font-size:18px"></i>&nbsp;
+                Paper
+            </a>
+            <a class="button" href="" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-github" style="font-size:18px"></i>&nbsp;
+                GitHub (coming soon)
+            </a>
+            
+            
+        </div>
+
+    </section>
+
+    <div class="container text-center" style="margin-top: 50px; text-align: center;">
+      <p class="title-art3"> Create Multiple Shots of Your Own Actor</p>
+    </div>
+
+    <section id="video">
+        <div class="title">
+          Multi-Shot Text-to-Video Generation
+        </div>
+              <div class="description">
+            Given multi-shot text prompts, EchoShot generates <span class="bold-text">multiple video clips featuring the same character</span>. It offers a <span class='bold-text'>highly flexible content controllability</span> incuding duration, camera movement, human appearance, expressions, behaviors, background, ...
+        </div>
+        <br>
+        <div class="flex-2">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/1-1.mp4"></video>
+                <div class="prompt">This segment shows an African American, adult, male. The character's hair is dark, short, and curly. He has a short beard or stubble. The character's attire is a grey full-zip hoodie worn over a purple t-shirt. The character's expression is serious and attentive, with a hint of concern or thoughtfulness. His eyes are wide and he maintains direct eye contact for most of the clip, then shifts his gaze slightly upwards and to the right, as if observing or considering something. The character's action is: his body remains mostly still, facing forward, while his head slightly lifts and his eyes shift their focus upwards and to the right. The video scene is indoors, featuring a background of warm, brown wood paneling. There are two wall-mounted lamps with white shades, emitting a warm glow, flanking a central wooden door or panel. On the left, a screen displays what appears to be a web interface or data. On the right, there's another smaller screen and a stack of yellow notes. The video lighting is soft and warm, with prominent light coming from the front, illuminating the character's face. The wall lamps in the background add ambient warmth, and the overall lighting creates a focused, slightly dramatic look on the character.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/1-2.mp4"></video>
+                <div class="prompt">This segment shows an African American, adult male.  The character's hair is dark, short, and tightly curled. He has a short beard or stubble. The character's attire is a plain grey short-sleeved t-shirt. The character's expression initially shows discomfort or pain, with his eyes closed and face grimacing. As he opens his eyes, he appears disoriented and then distressed, looking downwards and rubbing his head. The character's action is: he begins lying on his back, hands clasped over his abdomen, then slowly sits upright in bed. He then leans forward, bringing his right hand to rub the side of his head. The video scene is indoors, a bedroom. The character is in a bed with a light-colored duvet and pillows. The headboard is made of bamboo or similar wood slats. On either side of the bed are bedside tables; the left table has a lit table lamp and a white teacup with a saucer, and the right table has a lit table lamp and two green mugs. The video lighting is dim and warm, primarily from the two bedside lamps, creating a cozy but subdued atmosphere. The character's face is dimly lit, with shadows falling across his features.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/0-1.mp4"></video>
+                <div class="prompt">This segment shows an Asian, male, middle-aged. The character's hair is dark brown, slightly fluffy, with bangs combed back to reveal the forehead. The hair texture appears relatively soft. The character's attire is a dark suit, with a white shirt underneath and a black tie. The suit is well-tailored and the fabric appears formal. No other prominent accessories are worn. The character's expression is serious, with a focused gaze, tightly closed lips, and slightly furrowed brows, showing a contemplative or vigilant mood. The character's action is standing still, body slightly leaning forward, eyes looking straight ahead. The character does not perform any other obvious actions or interactions with objects. The video scene is an indoor environment, with a blurred wall in the background. The wall material appears to be rough stone bricks or a similar structure. The overall ambient light is dim, creating a sense of oppressive or mysterious atmosphere. The video lighting is low-key, with light mainly concentrated on the character's face, making the facial contours clearer. The background is in shadow, and the light contrast is strong, enhancing the dramatic effect of the shot.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/0-2.mp4"></video>
+                <div class="prompt">This segment shows an Asian, male, middle-aged. The character's hair is: dark brown, slightly wavy, moderate in volume, combed back to reveal the forehead. The hair is neat and shiny. The character does not wear any head accessories. The character's attire is: The character is wearing a light-colored long-sleeved shirt, with the collar open, revealing the collarbone. The character is wearing a dark tie, with some small patterns on it. The character does not wear any other accessories. The character's expression is: Initially, the character's expression is slightly serious, with a focused gaze, seemingly thinking. As time progresses, the expression gradually relaxes, with a hint of doubt in the eyes. The character's mouth corners occasionally twitch slightly, seemingly trying to control their emotions. The character's action is: The character stands still, head slightly turned, seemingly observing the surroundings. The character's hands hang naturally, and the body is slightly leaning forward. The character occasionally blinks, or lightly swallows. The video scene is: The video scene is set in an office. The office walls are dark, with some photos and documents hanging on them. There are some desks and chairs in the office, and the desks are piled with documents and books. There is also a desk lamp in the office, and the light is dim. A window can be seen in the background, with a blurred cityscape outside. The video lighting is: The video uses a low-key lighting method, and the overall light is dim. The main light source comes from in front of the character, illuminating the character's face. The light in the background is weaker, creating a mysterious and oppressive atmosphere.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/0-3.mp4"></video>
+                <div class="prompt">This segment shows an Asian, male, middle-aged. The character's hair is reddish-brown, slightly fluffy, with natural waves, fine and soft strands, and bangs casually resting on the forehead. No head accessories are used. The character's attire is a dark suit, with a white shirt and a black tie underneath. The suit is well-tailored and the fabric appears to be of good quality. No prominent accessories are worn, such as glasses or a watch. The character's expression is serious, with a focused gaze, corners of the mouth slightly down, seemingly thinking or worrying about something. In the latter half of the video, the character's expression becomes more anxious, with furrowed brows and unease revealed in the eyes. The character's action is: Initially, the character remains still, with slight changes in facial expression, seemingly listening or observing. Subsequently, the character raises a hand and gently adjusts their hair, a gesture that appears somewhat uneasy and anxious. The video scene is indoors, with a blurred background, but dark wooden paneling and decorative paintings can be discerned on the walls. On the left side of the frame, there is a blurred light source, possibly a fireplace or a desk lamp. The overall tone of the scene is dark, creating a sense of oppressive and mysterious atmosphere. The video lighting is low-key, with the main light source coming from the left side of the frame. The light is soft, but not very bright. The light is mainly concentrated on the character's face, making the facial contours clearer and also highlighting the character's expression. The background is relatively darker, creating a mysterious and oppressive atmosphere.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex-2">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/4-1.mp4"></video>
+                <div class="prompt">This segment shows an Asian, female, youth. The character's hair is: dark brown, fluffed up and coiled on top of the head, forming a messy bun, with part of the forehead exposed. The character's attire is: a beige crew-neck T-shirt worn underneath, with a light blue denim shirt worn over it, and the shirt is open. The character's expression is: slightly worried, with slightly furrowed brows, revealing a sense of sadness in the eyes, and lips slightly pursed. The character's action is: standing still, head slightly tilted, lips slightly parting and closing, seemingly speaking, hands naturally hanging down, with no obvious body movements. The video scene is: a city street at night, with a blurred background. Streetlights and vehicle lights are visible, along with some blurred figures walking around. There are trees and buildings on both sides of the street, and the overall environment is relatively dim. The video lighting is: low-key natural light, mainly relying on streetlights and vehicle lights of the city night view. The light is soft, but the overall brightness is low, creating a night atmosphere. There are slight shadows on the character's face, enhancing the three-dimensionality of the face.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/4-2.mp4"></video>
+                <div class="prompt">This segment shows an Asian, female, youth. The character's hair is: dark brown, fluffed up and coiled on top of the head, forming a messy bun, with part of the forehead exposed. The character's attire is: a beige crew-neck T-shirt worn underneath, with a light blue denim shirt worn over it, and the shirt is open. The character's expression is: slightly worried, with slightly furrowed brows, revealing a sense of sadness in the eyes, and lips slightly pursed. The character's action is: standing still, head slightly tilted, lips slightly parting and closing, seemingly speaking, hands naturally hanging down, with no obvious body movements. The video scene is: a city street at night, with a blurred background. Streetlights and vehicle lights are visible, along with some blurred figures walking around. There are trees and buildings on both sides of the street, and the overall environment is relatively dim. The video lighting is: low-key natural light, mainly relying on streetlights and vehicle lights of the city night view. The light is soft, but the overall brightness is low, creating a night atmosphere. There are slight shadows on the character's face, enhancing the three-dimensionality of the face.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/3-1.mp4"></video>
+                <div class="prompt">Camera pans left, medium shot. This segment shows a Caucasian, male, middle-aged. The character's hair is dark brown, medium length, voluminous, slightly fluffy, with natural waves, and some hair falls over the forehead and sides of the face. The character's attire is a light blue long-sleeved shirt, with the collar open, and a dark blue striped tie. The character's expression is serious, with a focused gaze, corners of the mouth slightly downturned, seemingly thinking or observing. The character's action is standing, body slightly angled to the left, head turned to the right, seemingly observing or listening, with hands naturally hanging down and no obvious body movements. The video scene is an office, with a light green background wall. On the left side, there is a whiteboard covered with names and school names, and on the right wall, a white bulletin board is hanging. The overall environment is relatively simple. The video lighting is generally dim, with light coming from the left, casting shadows on the character's face, creating a serious and oppressive atmosphere.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/3-2.mp4"></video>
+                <div class="prompt">Still shot, close-up. This segment shows a Caucasian, male, middle-aged. The character's hair is dark brown, slightly long, layered, naturally combed back, with some hair falling on both sides of the forehead. The character's attire is a light blue and white striped shirt, with the collar open, revealing the collarbone. The character is wearing a dark blue tie with white polka dots. The character's expression is calm, slightly serious. When speaking, the character's facial expression subtly changes with the tone of voice, for example, eyebrows slightly raise and corners of the mouth slightly turn up. The character's action is sitting on a sofa, body slightly leaning forward. When speaking, the character occasionally makes gestures with both hands, such as opening palms or gesticulating with fingers. The character's movements are not large, appearing relatively relaxed overall. The video scene is indoors, with a light green wall in the background, which has subtle textures. The character is sitting on a dark brown sofa, and the sofa material appears to be soft. The scene is simply arranged, without excessive decoration. The video lighting is soft natural light, with light coming from the front, illuminating the character's face and upper body. The light is evenly distributed, with no obvious shadows. The overall lighting conditions are relatively bright.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/3-3.mp4"></video>
+                <div class="prompt">Still shot, close-up. This segment shows a Caucasian, male, middle-aged. The character's hair is dark brown, slightly fluffy, naturally combed back, with slightly longer sideburns. The character's attire is a light blue Hawaiian shirt, with white and dark blue patterns printed on it, and the collar slightly open. The character's expression is relaxed and slightly smiling, with a focused gaze, seemingly listening or thinking. Occasionally, the corners of the mouth subtly turn up, showing a sense of calmness and confidence. The character's action is slight head movements, subtle lip movements, seemingly speaking, with the body remaining relatively still, shoulders relaxed, and hands possibly placed on a table or in front of the body. The video scene is an indoor office, with a blurred background. Some stacked files and office supplies are visible. The overall environment appears somewhat cluttered, but the lighting is sufficient. The video lighting is soft natural light, with light coming from the front, illuminating the character's face. Shadows are not obvious, and the overall light is even, creating a comfortable and relaxed atmosphere.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex-2">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/2-1.mp4"></video>
+                <div class="prompt">This segment shows a black person, male, middle-aged. The character's hair is black short hair, slightly fluffy, with strands naturally falling, and no head accessories are used. The character's attire is a dark turtleneck suit, with smooth material and no accessories worn. The character's expression is serious, with a focused gaze, slightly worried. As the footage progresses, the character gradually turns their head forward, with resolve in their eyes. The character's action is: initially with their back to the camera, head slightly turned, gaze looking into the distance, then slowly turning their head forward, their gaze becoming firm. The video scene is a high vantage point in a city at night, with blurred city lights in the background. The outlines of distant buildings are faintly visible, and the overall environment appears serene and profound. The video lighting is low-key side lighting, with light mainly concentrated on the character's face, making the facial contours more three-dimensional, while the background is relatively dim, creating a mysterious atmosphere.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/2-2.mp4"></video>
+                <div class="prompt">This segment shows a black person, male, middle-aged. The character's hair is black short hair, neatly combed back, revealing the forehead, with no head accessories. The character's attire is a black suit, with a black shirt underneath, and no accessories worn. The character's expression is serious, with a focused gaze, corners of the mouth slightly downward, overall presenting a calm and reserved emotion. The character's action is standing still, head slightly tilted downwards, gaze focused forward, with an upright body posture. The video scene is an indoor parking lot, with a black sedan parked in the background. The walls are made of concrete, and the overall environment is relatively dim. The video lighting is low-key side lighting, with light mainly concentrated on the character's face, creating a mysterious and oppressive atmosphere.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/5-1.mp4"></video>
+                <div class="prompt">This segment shows an Asian, male, youth. The character's hair is dark brown short curly hair, and the hair is fluffy. The character's attire is black leather armor, decorated with metal rivets, with a high collar covering most of the neck, and the armor material appears relatively rough. The character's expression is a mix of slight sadness and determination, with complex emotions revealed in the eyes, and the corners of the mouth slightly upturned, seemingly trying to stay calm. The character's action is standing still, head slightly tilted to the left, eyes gazing forward, with no obvious body movements. The video scene is a dim indoor environment, with a blurred background. The wall material appears to be stone walls, and the overall environment is quite oppressive, suggesting a tense atmosphere. The video lighting is low-key, with light mainly concentrated on the character's face, and the background is in shadow, creating a mysterious and oppressive atmosphere. The light color is biased towards cool tones, further intensifying this feeling.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/5-2.mp4"></video>
+                <div class="prompt">This segment shows an Asian, male, youth. The character's hair is dark brown short hair, slightly curly, and the strands are fluffy. The character's attire is dark chainmail, with metal shoulder pads on the chainmail, lined with dark fabric, and a high collar, with no other obvious accessories worn. The character's expression is serious, with eyes slightly melancholy, and the corners of the mouth slightly downward, with the overall mood appearing heavy. The character's action is standing still, body slightly leaning forward, hands naturally hanging down by the sides, gaze straight ahead. The video scene is indoors, with a background of stone walls and arched structures. The walls are darker in color, with mottled marks, and the left background is blurred, with a vague human figure faintly visible. The video lighting is low-key, the light is dim, the main light source comes from the left, the light is soft, and the shadows are heavy, creating an oppressive and heavy atmosphere.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/5-3.mp4"></video>
+                <div class="prompt">Camera zooms in, from medium shot to close-up. This segment shows an Asian, male, youth. The character's hair is brown, slightly curly, fluffy, and ear-length. The character's attire is a set of dark armor, with metal decorations on the armor, a brown scarf wrapped around the neck, a sword worn at the waist, and holding a cloth bag in hand. The character's expression is calm, with the corners of the mouth slightly upturned, and eyes carrying a hint of complex emotions. As the shot progresses, the character's smile gradually becomes more apparent, and the eyes also become softer. The character's action is initially standing still, body slightly angled towards the camera. As the shot progresses, the character gradually moves closer to the camera, eventually stopping, and the facial expression also changes. The video scene is an ancient port, surrounded by stone walls covered with moss. Some small boats and a raft filled with goods are floating on the water of the port. In the distance, there is a stone house, with green hills and a grey sky in the background. The video lighting is natural light, and the overall light is relatively soft, slightly dim, creating a dull and oppressive atmosphere.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex-2">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/6-1.mp4"></video>
+                <div class="prompt">This segment shows a black person, female, youth. The character's hair is light golden short hair, with ends slightly curled inwards, side-parted bangs, and wearing a black hairband. The character's attire is a brown knit sweater, with a dark brown coat worn over it, and a purple lining exposed at the coat collar. A gold necklace is worn around the neck, with a small pendant at the end of the necklace. The character's expression is slightly worried and serious, with eyes revealing alertness. The character's action is standing still, body slightly leaning forward, eyes gazing forward. The video scene is a dense forest, with tall and straight trees, moss covering the tree trunks, and the ground covered with green vegetation. Mist fills the background, creating a mysterious and eerie atmosphere. The video lighting is overall dim, with soft light, creating a gloomy atmosphere. The light mainly comes from above, illuminating the character's face, making the contours clearer.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/6-2.mp4"></video>
+                <div class="prompt">This segment shows a black person, female, youth. The character's hair is golden short hair, with ends slightly curled, fluffily framing the face. The character's attire is a high-necked long-sleeved knit shirt, with brown and purple horizontal stripes. The character's expression is serious, with a focused gaze, lips tightly closed, slightly pursed, revealing a pensive or worried emotion. As the video progresses, the character's expression gradually becomes slightly relaxed, and lips slightly open, seemingly speaking. The character's action is sitting still in a chair, body slightly leaning forward, head remaining still, eyes gazing forward. As the video progresses, the character's lips begin to move slightly, seemingly speaking, and the head also slightly raises. The video scene is indoors, with a patterned wallpaper background, dark in color. There is a window on the left side, and blurred trees and sky can be seen outside the window. Two plant paintings are hung on the right wall. A blurred glass jar is in the left foreground. The video lighting is overall dim, with the main light source coming from the window, illuminating the character's face, creating a soft and mysterious atmosphere.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/10-1.mp4"></video>
+                <div class="prompt">This segment shows a Caucasian, child. The character's hair is: fluffy golden curly hair, ample in volume, naturally distributed on the head, with no obvious styling marks. The character's attire is: The character is wearing a khaki uniform shirt, with two chest pockets, and buttons on the pockets. A black tie is tied around the shirt's collar. A black leather belt is worn around the waist, with a golden buckle. A black leather shoulder strap is slung over the shoulder, with some metal accessories attached to it. On the left arm, a red armband is worn, featuring a white circular pattern with a black emblem in the center. The character's expression is: Initially, the character's expression is serious, with eyes slightly tense and expectant. As the video progresses, the character's expression gradually relaxes, and the eyes reveal curiosity and slight surprise. The character's action is: The character stands still, body slightly leaning forward, hands naturally hanging down. The character's head turns slightly, eyes gazing forward. The character's lips are slightly parted, seemingly speaking or thinking. The video scene is: The video scene is an indoor room, with dark green wallpaper on the walls. Some paintings and decorations are hung on the walls. There is a window in the room with white curtains. Outside the window, some green trees and plants are visible. There is also some furniture in the room, such as tables and chairs, but these pieces of furniture are relatively blurred. The overall style of the room is relatively vintage and nostalgic. The video lighting is: The video uses a lighting method combining natural light and artificial light. Light enters from the window, illuminating the character's face and body. At the same time, there are some artificial light sources in the room, such as lamps, which provide soft light for the room. The overall lighting is relatively bright, but there are no obvious shadows.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/10-2.mp4"></video>
+                <div class="prompt">This segment shows a Caucasian, child. The character's hair is light brown, slightly curly, fluffed and combed back, with a black baseball cap on the head. The character's attire is a black uniform, with silver buttons on the uniform, an armband with a white circular pattern and a red cross emblem on the left arm, and a black cloth strap slung across the shoulder. The character's expression is slightly confused and worried, with eyes looking slightly upwards, seemingly thinking or observing something. The character's action is: body slightly leaning forward, head slightly turned, eyes focused on gazing forward. The video scene is indoors, the background is a reddish-brown wall, with an old wooden radio on the left side, and some documents and folders piled next to it. The video lighting is soft natural light, with light shining from the front, creating a contrast of light and shadow on the character's face, and the overall lighting is relatively warm.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/10-3.mp4"></video>
+                <div class="prompt">This segment shows a Caucasian, child. The character's hair is: light golden short hair, slightly curly, fluffed and covering the head, with darker roots and lighter tips. The character's attire is: wearing a brown zip-up jacket, with a yellow plaid shirt underneath, and the collar slightly open. A brown wristband is worn on the wrist. The character's expression is: tense, eyes wide open, lips slightly parted, seemingly a bit worried and scared. The character's action is: The character's body slightly leaning forward, one hand resting on a wooden surface, fingers curled, seemingly gripping tightly. The character's gaze is focused forward. The video scene is: The character is located in a room, with a green wall in the background, adorned with dark patterns. On the right side, there is a wooden door frame, and the door is closed. The lighting in the room is relatively dim, creating a sense of oppressive atmosphere. The video lighting is: The overall lighting is dim, with the main light source coming from the left, and the light is soft, illuminating the character's face, but the shadowed areas are also quite noticeable, enhancing the sense of depth and three-dimensionality of the image.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex-2">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/9-1.mp4"></video>
+                <div class="prompt">This segment shows a Caucasian, male, elderly. The character's hair is dark brown short hair, slightly sparse, combed back. The character's attire is a pink long-sleeved shirt, with the shirt collar open, and a silver bracelet worn on the wrist. The character's expression is serious, with eyes slightly melancholic, corners of the mouth slightly drooping, seemingly thinking or listening. The character's action is sitting by a table, with hands clasped on the tabletop, a cigar placed next to one hand. The character's body is slightly leaning forward, and the gaze is looking off-screen. The video scene is indoors, with a green wall in the background. Many photos and posters are pasted on the wall, along with some green plants. There is an old television set in the room. The overall environment appears somewhat cluttered and crowded. The video lighting is soft light, with light mainly coming from the left side of the character, making the character's facial contours clear, but the shadowed areas are also quite noticeable. The overall lighting is warm-toned.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/9-2.mp4"></video>
+                <div class="prompt">This segment shows a Caucasian, male, elderly. The character's hair is dark brown short hair, slightly sparse, with the hairstyle relatively close-fitting, and no obvious head accessories. The character's attire is a blue denim shirt, with two chest pockets on the shirt, and buttons tightly fastened. The character's expression is serious, with eyes slightly melancholic, corners of the mouth slightly downward, and the overall mood appearing heavy. The character's action is standing, body slightly leaning forward, hands naturally hanging down, gaze focused forward, with no obvious body movements. The video scene is indoors, with a family dining room or living room in the background, featuring wooden door frames and walls. Paintings are hung on the walls, and flowers and candles are placed on the dining table. The overall environment is warm and slightly dim. The video lighting is low-key illumination, with soft light. The main light source comes from the front, creating a calm and reserved atmosphere.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex-4">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/12-1.mp4"></video>
+                <div class="prompt">Camera moves up, medium shot. This segment shows an Asian, female, youth. The character's hair is dark brown short hair, with ends slightly curled inwards, and the overall style is simple and sharp. The character's attire is a dark blue shirt, with the collar open, revealing a white T-shirt worn underneath. A blue work badge is worn on the chest. The character's expression is focused, with calm eyes, occasionally slightly furrowing eyebrows, seemingly thinking about problems. As the plot develops, the character's expression gradually becomes serious, revealing a hint of anxiety. The character's action is sitting at a desk, body slightly leaning forward, hands placed on the desktop. The character's head slightly turns, seemingly listening to or observing the surroundings. Subsequently, the character stands up from the chair. The video scene is an office, with a computer, documents, stationery, and other items placed on the desk, appearing somewhat messy. In the background, there is a row of bookshelves, piled with books and folders. Some light comes through the window. The video lighting is a mix of natural light and indoor lighting. The overall light is relatively soft, but slightly dim, creating a serious working atmosphere. The light is mainly concentrated on the character's face, highlighting the character's expression.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/12-2.mp4"></video>
+                <div class="prompt">Handheld shot, close-up. This segment shows an Asian, female, youth. The character's hair is dark brown short hair, with ends slightly curled inwards, and the overall style is simple and sharp. The character's attire is a dark blue shirt, with the collar open, revealing a white T-shirt worn underneath. A blue work badge is worn on the chest. The character's expression is sad, shedding tears. The character's action is standing still, body slightly leaning forward, crying. The character does not make large movements. The video scene is a company pantry, with a coffee machine, water dispenser, and some snack racks in the background. The main light source comes from the room's light fixtures. The light is dim, creating an oppressive and tense atmosphere.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/12-3.mp4"></video>
+                <div class="prompt">Camera zooms in, from medium shot to close-up. This segment shows an Asian, female, youth. The character's hair is dark brown short hair, with ends slightly curled inwards, and the overall style is simple and sharp. The character's attire is a white long-sleeved shirt, with a light blue skirt on the lower body, and a canvas bag slung over the shoulder. The overall dressing style is simple and generous. The character's expression is smiling, with friendliness and curiosity in the eyes. As the door gradually opens, the smile becomes more apparent, seemingly anticipating what is outside the door. The character's action is slowly opening a brown wooden door, with the body gradually emerging from behind the door. At the same time, the head slightly tilts outwards, seemingly observing the scene outside the door, one hand holding a bag, and the other hand holding the door. The video scene is indoors, with a white wall in the background. The wall has vertical line decorations, and next to the door, there is a white switch and an air conditioner controller. The overall environment is simple and clean. The video lighting is soft indoor lighting. The light is evenly distributed on the character and the background, with no obvious shadows, creating a warm and comfortable atmosphere.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/12-4.mp4"></video>
+                <div class="prompt">Handheld shot, close-up. This segment shows an Asian, female, youth. The character's hair is dark brown short hair, with ends slightly curled inwards, and the overall style is simple and sharp. The character's attire is a dark blue pinstriped suit jacket, with a white shirt underneath, and the collar slightly open. The character's expression is serious, with a focused gaze, occasionally slightly furrowing eyebrows, seemingly engaged in a serious phone conversation, with a hint of anxiety. The character's action is holding a phone to the ear with the right hand, head slightly tilted, eyes occasionally looking forward, left hand on the steering wheel, body remaining relatively still. The video scene is inside a car, driver's seat position, with dark interior in the background. A blurred city night scene with scattered lights can be seen outside the car window. The video lighting is overall dim, with the main light source coming from the front, illuminating the character's face, creating a mysterious and tense atmosphere.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/11-1.mp4"></video>
+                <div class="prompt">This segment shows a Caucasian, male, elderly. The character's hair is short, grayish-white, fluffy, and slightly combed back. The character's attire is a light green shirt, worn under a dark gray vest. The vest has pockets and zipper details. The character's expression is calm, with a slight smile, and focused eyes, seemingly listening or thinking. The character's action is standing still, body slightly leaning forward, head slightly turned, seemingly conversing with someone. The video scene is: The background is a metal-structured wall with many circular lights, which are blurred. The wall structure has repeating lines and geometric shapes. The overall scene appears simple and modern. The video lighting is overall soft, with the main light source coming from the front, illuminating the character's face and upper body.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/11-2.mp4"></video>
+                <div class="prompt">This segment shows a Caucasian, male, elderly. The character's hair is short, grayish-white, fluffy, and slightly combed back. The character's attire is a light green shirt, worn under a dark gray vest. The vest has pockets and zipper details. The character's expression is calm, with a slight smile, and focused eyes, seemingly listening or thinking. The character's action is sitting by the window in a cafe, holding a cup of coffee and sipping it gently. The video scene is a charming cafe, where the aroma of coffee fills the air, soft lighting illuminates the tables and chairs, and art paintings hang on the walls, creating a warm and romantic atmosphere. The video lighting is a combination of indoor and outdoor light, with overall soft lighting, highlighting the comfort of the coffee and the character.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/11-3.mp4"></video>
+                <div class="prompt">This segment shows a Caucasian, male, elderly. The character's hair is short, grayish-white, fluffy, and slightly combed back. The character's attire is a light green shirt, worn under a dark gray vest. The vest has pockets and zipper details. The character's expression is calm, with a slight smile, and focused eyes, seemingly listening or thinking. The character's action is slowly strolling along the beach, occasionally stopping to gaze into the distance. The video scene is an open beach, with waves gently lapping the sand, sea breeze blowing through his hair and clothes, the sea and sky merging in the distance, and occasional seagulls flying by, appearing serene and vast. The video lighting is natural light, with sunlight spilling over the sea and the character, creating a warm and free atmosphere.</div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="video">
+        <div class="title">
+          Multi-Shot Attribute Editing
+        </div>
+              <div class="description">
+            EchoShot demonstrates <span class='bold-text'>an emergent capability of attribute editing</span>. In a set of shots, it precisely edits certain attributes while keeping others unchanged, according to the given prompts.
+        </div>
+        <div class="flex">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e5-1.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[HAIRSTYLE EDIT] Reddish-brown, braided into two pigtails, hanging down to the chest. Wearing a brown straw hat, with dark decoration on the brim of the hat.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e5-2.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[HAIRSTYLE EDIT] Black, chin-length bob, with ends curled inwards, wearing a white hair clip, which is delicate and cute.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e5-3.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[HAIRSTYLE EDIT] Golden, very short hair, with neatly trimmed sideburns, without any head accessories.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex-2">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e1-1.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[APPAREL EDIT] Wearing a silver ring, and has a brown bracelet on the wrist.<br>[EXPRESSION EDIT] Emotional and somewhat sad.<br>[BEHAVIOR EDIT] Swaying head and hands slightly, then lowering his head.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e1-2.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[APPAREL EDIT] Wearing a watch with a white dial.<br>[EXPRESSION EDIT] Focused and serious.<br>[BEHAVIOR EDIT] Speaking, with his head constantly shaking.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e4-1.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[HAIRSTYLE EDIT] Fluffy, medium-length light brown hair with natural curls.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e4-2.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[HAIRSTYLE EDIT] Silver, meticulously combed-back.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e4-3.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[HAIRSTYLE EDIT] Red Mohawk, with both sides shaved and a tuft of vibrant red hair standing up in the middle.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex-2">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e2-1.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[APPAREL EDIT] Wearing a light-colored crew-neck T-shirt, with a dark pink knit cardigan worn over it. [BEHAVIOR EDIT] Speaking, with her head constantly shaking.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e2-2.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[APPAREL EDIT] Wearing a dark grey hoodie. [BEHAVIOR EDIT] Listening, blinking occasionally.</div>
+            </div>
+        </div>
+        <br>
+        <div class="flex-4">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e3-1.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[APPAREL EDIT] Wearing a white shirt with a black knitted vest worn over it, and a neat collar.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e3-2.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[APPAREL EDIT] Wearing a blue denim jacket with a black and white striped crew-neck shirt underneath.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e3-3.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[APPAREL EDIT] Wearing blue overalls with a white long-sleeved T-shirt underneath. The metal buckles of the overalls are shining.</div>
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/e3-4.mp4"></video>
+                <div class="prompt" style="font-size: 18px;">[APPAREL EDIT] Wearing a red sweater with white star patterns on it. The sweater has ribbed cuffs and collar.</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="method">
+        <div class="title">
+          Modeling Multi-Shot Video Generation
+        </div>
+        <div class="description">
+            In this work, we propose <span class='bold-text'>a native and scalable multi-shot framework with shot-aware position embedding mechanisms</span>, which models inter-shot variations and establishes intricate correspondence between multi-shot visual content and their textual descriptions. This simple yet effective design enables <span class='bold-text'>direct training on multi-shot video data without introducing additional computational overhead</span>.
+        </div>
+        <img src="static/images/framework.jpg" class="show-img">
+        
+    </section>
+
+    <section id="dataset">
+        <div class="title">
+          PortraitGala: The First Multi-shot Portrait Video Dataset
+        </div>
+        <div class="description">
+          To facilitate model training within multi-shot scenario, we construct <span class='bold-text'>PortraitGala, a large-scale and high-fidelity human-centric video dataset featuring cross-shot identity consistency and fine-grained captions</span> such as facial attributes, outfits, and dynamic motions.
+        </div>
+        <img src="static/images/data1.jpg" class="show-img">
+        <br>
+        <br>
+        <img src="static/images/data2.jpg" class="show-img">
+        
+    </section>
+
+
+    <section class="bibtex-section">
+        <h3>BibTeX</h3>
+        <pre class="bibtex-code">@article{wang2025echoshot,
+          title={EchoShot: Multi-Shot Portrait Video Generation},
+          author={Jiahao Wang, Hualian Sheng, Sijia Cai, Weizhan Zhang, Caixia Yan, Yachuang Feng, Bing Deng, Jieping Ye},
+          journal={arXiv preprint arXiv:2506.15838},
+          year={2025}
+        }</pre>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.min.js"></script>
+
+    <script>
+        
+        $(document).ready(function () {
+            $('.carousel-item', '.show-neighbors').each(function () {
+                var next = $(this).next();
+                if (!next.length) {
+                    next = $(this).siblings(':first');
+                }
+                next.children(':first-child').clone().appendTo($(this));
+            }).each(function () {
+                var prev = $(this).prev();
+                if (!prev.length) {
+                    prev = $(this).siblings(':last');
+                }
+                prev.children(':nth-last-child(2)').clone().prependTo($(this));
+            });
+
+            function playActiveVideo() {
+                $('.carousel-video').each(function () {
+                    this.pause();
+                });
+                
+                var activeVideo = $('#carouselExampleCaptions .carousel-item.active .video-wrapper video.carousel-video').get(0);
+
+                if (activeVideo) {
+                    activeVideo.play();
+                }
+            }
+
+            $('#carouselExampleCaptions').on('slide.bs.carousel', function () {
+                $('.carousel-video').each(function () {
+                    this.pause();
+                });
+            });
+
+            $('#carouselExampleCaptions').on('slid.bs.carousel', function () {
+                playActiveVideo();
+            });
+
+            playActiveVideo();
+        });
+        /// 动态调整背景图片透明度
+        document.addEventListener('DOMContentLoaded', function() {
+            const body = document.body;
+
+            // 定义透明度开始变化的滚动距离（从页面顶部开始计算）
+            // 例如：滚动到 100px 时开始变化
+            const scrollThresholdStart = 0;
+
+            // 定义透明度变化结束的滚动距离
+            // 例如：滚动到 600px 时完全透明
+            const scrollThresholdEnd = 500;
+
+            function updateBackgroundOpacity() {
+                // 获取当前滚动距离
+                const scrollY = window.scrollY || window.pageYOffset;
+
+                let newOpacity;
+
+                if (scrollY <= scrollThresholdStart) {
+                    // 在起始点之前，背景完全不透明 (opacity = 1)
+                    newOpacity = 1;
+                } else if (scrollY >= scrollThresholdEnd) {
+                    // 在结束点之后，背景完全透明 (opacity = 0)
+                    newOpacity = 0.4;
+                } else {
+                    // 在起始点和结束点之间，根据滚动进度计算透明度
+                    // 计算滚动进度 (0 到 1 之间)
+                    const scrollRange = scrollThresholdEnd - scrollThresholdStart;
+                    const scrolledProgress = scrollY - scrollThresholdStart;
+                    
+                    // 将进度映射到透明度 (1 到 0)
+                    // 当 scrolledProgress = 0 (在起始点) 时，opacity = 1
+                    // 当 scrolledProgress = scrollRange (在结束点) 时，opacity = 0
+                    newOpacity = 1-(scrolledProgress / scrollRange)*0.6;
+                }
+
+                // 确保透明度值始终在 0 到 1 之间
+                newOpacity = Math.max(0, Math.min(1, newOpacity));
+
+                // 更新 body 上的 CSS 变量，这将影响 ::before 伪元素的透明度
+                body.style.setProperty('--bg-opacity', newOpacity.toFixed(3)); // toFixed(3) 保持小数精度，使过渡更平滑
+            }
+
+            // 页面加载时立即调用一次，以根据初始滚动位置设置背景透明度
+            updateBackgroundOpacity();
+
+            // 监听滚动事件，每次滚动时更新背景透明度
+            window.addEventListener('scroll', updateBackgroundOpacity);
+        });
+
+        /// 动态调整文字透明度、大小
+        // 获取所有元素
+        // 定义初始和最大字体大小
+        const minFontSize = 25; // 最小字体大小（单位：px）
+        const maxFontSize = 30; // 最大字体大小（单位：px）
+
+        const titles = document.querySelectorAll('.title')
+        const descriptions = document.querySelectorAll('.description');
+
+        // 监听滚动事件
+        window.addEventListener('scroll', () => {
+            // 获取当前滚动距离
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const viewportHeight1 = window.innerHeight;
+            // 遍历每个标题，动态调整透明度
+            descriptions.forEach((description, index) => {
+                    const rect = description.getBoundingClientRect();
+
+                    if (rect.top < viewportHeight1 * 0.8) {
+                    const opacity = Math.max(5 - 5*(viewportHeight1-rect.top)/viewportHeight1, 0);
+
+                    // 将透明度应用到标题
+                    description.style.opacity = opacity;
+                    // 计算字体大小（根据滚动距离动态调整）
+                    const fontSize = maxFontSize - (-5+5*(viewportHeight1-rect.top)/viewportHeight1) * (maxFontSize - minFontSize);
+                    const textElement = titles[index]
+                    // 将字体大小应用到目标元素
+                    textElement.style.fontSize = `${Math.min(Math.max(fontSize, minFontSize),maxFontSize)}px`;
+                    const title_opacity = Math.max(4 - 3*(viewportHeight1-rect.top)/viewportHeight1, 0.7);
+                    textElement.style.opacity = title_opacity;
+                }
+            });
+        });
+
+        /// 页面滚动内容浮现
+        // 获取所有需要动画的元素
+        const title3s = Array.from(document.querySelectorAll('.title-art3'));
+        const flexs = Array.from(document.querySelectorAll('.flex'));
+        const flex2s = Array.from(document.querySelectorAll('.flex-2'))
+        const flex4s = Array.from(document.querySelectorAll('.flex-4'))
+        const showimgs = Array.from(document.querySelectorAll('.show-img'))
+        const boxes = [...titles, ...descriptions, ...title3s, ...flexs, ...flex2s, ...flex4s, ...showimgs]
+
+        // 监听滚动事件
+        window.addEventListener('scroll', () => {
+            boxes.forEach(box => {
+                // 获取元素相对于视口的位置
+                const boxTop = box.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+
+                // 当元素进入视口时添加 'active' 类
+                if (boxTop < windowHeight * 0.85) { // 视口高度的 80% 时触发
+                    box.classList.add('active');
+                }
+            });
+        });
+
+        // 页面加载时手动触发一次滚动事件（防止初始可见元素未激活）
+        window.dispatchEvent(new Event('scroll'));
+    </script>
+
+</body>
+</html>
