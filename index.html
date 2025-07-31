@@ -482,7 +482,16 @@
             transform: translateY(0); /* 回到原位 */
         }
 
-        
+        .video-overlay-logo {
+            position: absolute;
+            top: 1vh;
+            left: 1vh;
+            width: 5vw; /* 或者你希望的任何尺寸 */
+            height: auto;
+            z-index: 10;
+            border: 0.4vh solid #dcdcdc;      /* 边框 */
+            /* transition: opacity 0.3s; */
+        }
 
     </style>
 </head>
@@ -963,6 +972,130 @@
                 <div class="prompt" style="font-size: 18px;">[APPAREL EDIT] Wearing a red sweater with white star patterns on it. The sweater has ribbed cuffs and collar.</div>
             </div>
         </div>
+    </section>
+
+    <section id="video">
+        <div class="title">
+          Personalized Multi-Shot Generation
+        </div>
+              <div class="description">
+            With a face condition branch, EchoShot is extensible to personalized multi-shot portrait video generation. You can <span class='bold-text'>customize the multiple shots featuring a specific given reference</span>.
+        </div>
+        <div class="flex">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/pmt2v-1-1.mp4"></video>
+                <img src="static/videos/freeman.jpg" alt="Logo" class="video-overlay-logo">
+                <!-- <div class="prompt" style="font-size: 18px;">text</div> -->
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/pmt2v-1-2.mp4"></video>
+                <!-- <div class="prompt" style="font-size: 18px;">text</div> -->
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/pmt2v-1-3.mp4"></video>
+                <!-- <div class="prompt" style="font-size: 18px;">text</div> -->
+            </div>
+        </div>
+    </section>
+
+    <section id="video">
+        <div class="title">
+          Infinite-Shot Generation
+        </div>
+              <div class="description">
+            With <span class='bold-text'>a tailored RefAttn design</span>, EchoShot orchestrates different generation rounds to <span class='bold-text'>generate infinitely extendable number of shots</span>, marking a major advancement toward real-world application.
+        </div>
+        <div class="flex">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/inft2v-1.mp4"></video>
+                <!-- <div class="prompt" style="font-size: 18px;">text</div> -->
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/inft2v-2.mp4"></video>
+                <!-- <div class="prompt" style="font-size: 18px;">text</div> -->
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/inft2v-3.mp4"></video>
+                <!-- <div class="prompt" style="font-size: 18px;">text</div> -->
+            </div>
+        </div>
+        <div class="flex">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/inft2v-4.mp4"></video>
+                <!-- <div class="prompt" style="font-size: 18px;">text</div> -->
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/inft2v-5.mp4"></video>
+                <!-- <div class="prompt" style="font-size: 18px;">text</div> -->
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/inft2v-6.mp4"></video>
+                <!-- <div class="prompt" style="font-size: 18px;">text</div> -->
+            </div>
+        </div>
+        <div class="flex">
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/inft2v-7.mp4"></video>
+                <!-- <div class="prompt" style="font-size: 18px;">text</div> -->
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/inft2v-8.mp4"></video>
+                <!-- <div class="prompt" style="font-size: 18px;">text</div> -->
+            </div>
+            <div class="prompt-wrap full-screen-wrap" style="position: relative;">
+                <div class="loading-placeholder">
+                    <div class="loading-text">Loading...</div>
+                    <div class="loading-icon"><img src="static/images/load.gif"></div>
+                </div>
+                <video autoplay playsinline muted loop onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';" src="./static/videos/inft2v-9.mp4"></video>
+                <!-- <div class="prompt" style="font-size: 18px;">text</div> -->
+            </div>
+        </div>
+        
     </section>
 
     <section id="method">
